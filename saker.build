@@ -1,0 +1,140 @@
+global(VERSION_saker.windows) = "0.8.0"
+global(DEPENDENCIES_saker.windows) = [
+	saker.standard, 
+	saker.sdk.support,
+	saker.process-api,
+]
+
+static(VERSION_saker.build) = nest.dependency.resolve(
+	saker.build,
+	Filters: nest.dependency.filter.kind([]),
+)[Bundles][0][BundleIdentifier][VersionNumber]
+static(VERSION_saker.nest) = nest.dependency.resolve(
+	saker.nest,
+	Filters: nest.dependency.filter.kind([]),
+)[Bundles][0][BundleIdentifier][VersionNumber]
+
+compile(
+	out javac,
+) {
+	$resolveddependencies = nest.dependency.resolve(
+		global(DEPENDENCIES_saker.windows),
+		Filters: nest.dependency.filter.compile(CompileTransitive: false)
+	)
+	$javac = saker.java.compile(
+		SourceDirectories: [
+			src/main/
+		],
+		ClassPath: [
+			saker.java.classpath.bundle([
+				"saker.nest-api-v{ static(VERSION_saker.nest) }",
+				"saker.build-api-v{ static(VERSION_saker.build) }",
+			]),
+			saker.java.classpath.bundle($resolveddependencies),
+		],
+		Identifier: "saker.windows",	
+	)
+}
+export(
+	in compile = include(compile),
+	out compile,
+	out mainjar,
+	out apijar,
+	out impljar,
+	out sourcejar,
+	
+	out bundlepaths = [
+		$mainjar[Path],
+		$apijar[Path],
+		$impljar[Path],
+		$sourcejar[Path],
+	]
+) {
+	$mainjar = saker.jar.create(
+		Output: saker.windows.jar,
+		Resources: [
+			{
+				Directory: $compile[javac][ClassDirectory],
+				Resources: saker/windows/main/**,
+			},
+			{
+				Directory: main/resources/,
+				Resources: **,
+			},
+		],
+		Manifest: {
+			MainAttributes: {
+				Nest-Bundle-Format-Version: 1,
+				Nest-Bundle-Identifier: "saker.windows-v{ global(VERSION_saker.windows) }",
+				Nest-Bundle-Source: "saker.windows-sources-v{ global(VERSION_saker.windows) }",
+			},
+		},
+	)
+	$apijar = saker.jar.create(
+		Output: saker.windows-api.jar,
+		Resources: [
+			{
+				Directory: $compile[javac][ClassDirectory],
+				Resources: saker/windows/api/**,
+			},
+			{
+				Directory: api/resources/,
+				Resources: **,
+			},
+		],
+		Manifest: {
+			MainAttributes: {
+				Nest-Bundle-Format-Version: 1,
+				Nest-Bundle-Identifier: "saker.windows-api-v{ global(VERSION_saker.windows) }",
+				Nest-Bundle-Source: "saker.windows-sources-v{ global(VERSION_saker.windows) }",
+			},
+		},
+	)
+	$impljar = saker.jar.create(
+		Output: saker.windows-impl.jar,
+		Resources: [
+			{
+				Directory: $compile[javac][ClassDirectory],
+				Resources: saker/windows/impl/**,
+			},
+			{
+				Directory: impl/resources/,
+				Resources: **,
+			},
+			{
+				Files: LICENSE,
+				TargetDirectory: META-INF,
+			},
+		],
+		Manifest: {
+			MainAttributes: {
+				Nest-Bundle-Format-Version: 1,
+				Nest-Bundle-Identifier: "saker.windows-impl-v{ global(VERSION_saker.windows) }",
+				Nest-Bundle-Source: "saker.windows-sources-v{ global(VERSION_saker.windows) }",
+			},
+		},
+	)
+	$sourcejar = saker.jar.create(
+		Output: saker.windows-sources.jar,
+		Resources: [
+			{
+				Directory: [src/main/],
+				Resources: [**/*.java],
+			},
+			{
+				Files: LICENSE,
+				TargetDirectory: META-INF,
+			},
+		],
+		Manifest: {
+			MainAttributes: {
+				Nest-Bundle-Format-Version: 1,
+				Nest-Bundle-Identifier: "saker.windows-sources-v{ global(VERSION_saker.windows) }",
+			},
+		},
+	)
+}
+install() {
+	$export = include(export)
+	nest.local.install($export[bundlepaths])
+}

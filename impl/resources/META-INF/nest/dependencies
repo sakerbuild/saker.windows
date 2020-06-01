@@ -1,0 +1,6 @@
+saker.windows-api
+	classpath: [this]
+saker.standard-api
+	classpath: [0.8.1)
+saker.process-api
+	classpath: [0)

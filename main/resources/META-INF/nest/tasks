@@ -1,0 +1,9 @@
+saker.appx.bundle=saker.windows.main.appx.BundleAppxTaskFactory
+saker.appx.launch=saker.windows.main.appx.LaunchAppxTaskFactory
+saker.appx.manifest.patch=saker.windows.main.appx.manifest.PatchAppxManifestTaskFactory
+saker.appx.prepare=saker.windows.main.appx.PrepareAppxTaskFactory
+saker.appx.package=saker.windows.main.appx.PackageAppxTaskFactory
+saker.appx.register=saker.windows.main.appx.RegisterAppxTaskFactory
+saker.windows.sdk.uap=saker.windows.main.sdk.WindowsUapSDKTaskFactory
+saker.windows.sdk.windowskits=saker.windows.main.sdk.WindowsKitsSDKTaskFactory
+saker.windows.signtool.sign=saker.windows.main.signtool.SigntoolSignTaskFactory
