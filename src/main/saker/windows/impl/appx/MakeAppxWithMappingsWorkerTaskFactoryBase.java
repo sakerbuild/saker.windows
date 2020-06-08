@@ -42,9 +42,9 @@ import saker.windows.api.SakerWindowsUtils;
 public abstract class MakeAppxWithMappingsWorkerTaskFactoryBase<T> implements TaskFactory<T>, Task<T>, Externalizable {
 	private static final long serialVersionUID = 1L;
 
-	private NavigableMap<String, SDKDescription> sdks;
-
 	private NavigableMap<SakerPath, SakerPath> mappings;
+
+	private NavigableMap<String, SDKDescription> sdks;
 
 	/**
 	 * For {@link Externalizable}.

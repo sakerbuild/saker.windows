@@ -3,7 +3,6 @@ package saker.windows.main.appx;
 import java.util.Map;
 import java.util.NavigableMap;
 
-import saker.build.exception.InvalidPathFormatException;
 import saker.build.file.path.SakerPath;
 import saker.build.runtime.execution.ExecutionContext;
 import saker.build.task.ParameterizableTask;
@@ -17,6 +16,7 @@ import saker.nest.utils.FrontendTaskFactory;
 import saker.sdk.support.api.SDKDescription;
 import saker.sdk.support.main.SDKSupportFrontendUtils;
 import saker.sdk.support.main.option.SDKDescriptionTaskOption;
+import saker.std.main.file.utils.TaskOptionUtils;
 import saker.windows.api.appx.PrepareAppxWorkerTaskOutput;
 import saker.windows.impl.appx.PackageAppxWorkerTaskFactory;
 import saker.windows.impl.appx.PackageAppxWorkerTaskIdentifier;
@@ -49,12 +49,7 @@ public class PackageAppxTaskFactory extends FrontendTaskFactory<Object> {
 				NavigableMap<SakerPath, SakerPath> mappings = inputOption.getMappings(taskcontext);
 				SakerPath outputpath;
 				if (outputOption != null) {
-					if (!outputOption.isForwardRelative()) {
-						throw new InvalidPathFormatException("Output" + " must be forward relative: " + outputOption);
-					}
-					if (outputOption.getFileName() == null) {
-						throw new InvalidPathFormatException("Output" + " must have a file name: " + outputOption);
-					}
+					TaskOptionUtils.requireForwardRelativePathWithFileName(outputOption, "Output");
 					outputpath = outputOption;
 				} else {
 					outputpath = inputOption.inferRelativeOutput(taskcontext);

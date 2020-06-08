@@ -34,7 +34,11 @@ public class PrepareAppxWorkerTaskFactory
 	}
 
 	public PrepareAppxWorkerTaskFactory(NavigableMap<SakerPath, FileLocation> resources) {
-		this.prepareTaskFactory = SakerStandardTaskUtils.createPrepareDirectoryTaskFactory(resources);
+		this(SakerStandardTaskUtils.createPrepareDirectoryTaskFactory(resources));
+	}
+
+	public PrepareAppxWorkerTaskFactory(TaskFactory<? extends PrepareDirectoryWorkerTaskOutput> prepareTaskFactory) {
+		this.prepareTaskFactory = prepareTaskFactory;
 	}
 
 	@Override
