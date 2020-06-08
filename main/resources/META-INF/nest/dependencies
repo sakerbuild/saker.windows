@@ -1,6 +1,6 @@
 saker.windows-api
 	classpath: [0)
 saker.standard
-	classpath: [0)
+	classpath: [0.8.4)
 saker.sdk.support
 	classpath: [0.8.3)

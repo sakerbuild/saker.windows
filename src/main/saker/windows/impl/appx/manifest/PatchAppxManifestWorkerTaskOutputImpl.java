@@ -7,6 +7,8 @@ import java.io.ObjectOutput;
 
 import saker.build.file.path.SakerPath;
 import saker.build.thirdparty.saker.util.io.SerialUtils;
+import saker.std.api.file.location.ExecutionFileLocation;
+import saker.std.api.file.location.FileLocation;
 import saker.windows.api.appx.manifest.PatchAppxManifestWorkerTaskOutput;
 
 final class PatchAppxManifestWorkerTaskOutputImpl implements Externalizable, PatchAppxManifestWorkerTaskOutput {
@@ -22,6 +24,16 @@ final class PatchAppxManifestWorkerTaskOutputImpl implements Externalizable, Pat
 
 	public PatchAppxManifestWorkerTaskOutputImpl(SakerPath outputPath) {
 		this.outputPath = outputPath;
+	}
+
+	//for auto-conversion
+	public SakerPath toSakerPath() {
+		return getPath();
+	}
+
+	//for auto-conversion
+	public FileLocation toFileLocation() {
+		return ExecutionFileLocation.create(getPath());
 	}
 
 	@Override

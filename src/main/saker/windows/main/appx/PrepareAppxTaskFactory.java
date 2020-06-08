@@ -15,19 +15,19 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import saker.build.exception.InvalidPathFormatException;
 import saker.build.file.SakerFile;
 import saker.build.file.content.ContentDescriptor;
+import saker.build.file.content.DirectoryContentDescriptor;
 import saker.build.file.path.SakerPath;
 import saker.build.file.provider.LocalFileProvider;
 import saker.build.runtime.execution.ExecutionContext;
 import saker.build.task.CommonTaskContentDescriptors;
 import saker.build.task.ParameterizableTask;
 import saker.build.task.TaskContext;
+import saker.build.task.exception.MissingRequiredParameterException;
 import saker.build.task.utils.SimpleStructuredObjectTaskResult;
 import saker.build.task.utils.annot.SakerInput;
 import saker.build.task.utils.dependencies.EqualityTaskOutputChangeDetector;
-import saker.build.task.utils.dependencies.RecursiveFileCollectionStrategy;
 import saker.build.thirdparty.saker.util.ObjectUtils;
 import saker.build.trace.BuildTrace;
 import saker.nest.utils.FrontendTaskFactory;
@@ -36,13 +36,16 @@ import saker.std.api.file.location.FileLocation;
 import saker.std.api.file.location.FileLocationVisitor;
 import saker.std.api.file.location.LocalFileLocation;
 import saker.std.api.util.SakerStandardUtils;
+import saker.std.main.dir.prepare.RelativeContentsTaskOption;
 import saker.std.main.file.option.FileLocationTaskOption;
-import saker.std.main.file.option.MultiFileLocationTaskOption;
 import saker.std.main.file.utils.TaskOptionUtils;
 import saker.windows.impl.appx.PrepareAppxWorkerTaskFactory;
 import saker.windows.impl.appx.PrepareAppxWorkerTaskIdentifier;
 
 public class PrepareAppxTaskFactory extends FrontendTaskFactory<Object> {
+	private static final SakerPath PATH_APPXMANIFESTXML = SakerPath.valueOf("AppxManifest.xml");
+	private static final Object DEP_TAG_APPXMANIFESTXML_CONTENTS = PATH_APPXMANIFESTXML;
+
 	private static final long serialVersionUID = 1L;
 
 	public static final String TASK_NAME = "saker.appx.prepare";
@@ -51,11 +54,11 @@ public class PrepareAppxTaskFactory extends FrontendTaskFactory<Object> {
 	public ParameterizableTask<? extends Object> createTask(ExecutionContext executioncontext) {
 		return new ParameterizableTask<Object>() {
 
-			@SakerInput(value = "AppxManifest", required = true)
+			@SakerInput(value = "AppxManifest")
 			public FileLocationTaskOption appxManifestOption;
 
-			@SakerInput(value = "Files")
-			public Collection<MultiFileLocationTaskOption> filesOption;
+			@SakerInput(value = "Contents")
+			public Collection<RelativeContentsTaskOption> contentsOption;
 
 			@SakerInput(value = "Output")
 			public SakerPath outputOption;
@@ -67,54 +70,39 @@ public class PrepareAppxTaskFactory extends FrontendTaskFactory<Object> {
 				}
 
 				FileLocation appxfl = TaskOptionUtils.toFileLocation(appxManifestOption, taskcontext);
-				filesOption = ObjectUtils.cloneArrayList(filesOption, MultiFileLocationTaskOption::clone);
+				contentsOption = ObjectUtils.cloneArrayList(contentsOption, RelativeContentsTaskOption::clone);
+				NavigableMap<SakerPath, FileLocation> resources = RelativeContentsTaskOption.toInputMap(taskcontext,
+						contentsOption, null);
+				if (resources == null) {
+					resources = new TreeMap<>();
+				}
+				if (appxfl == null) {
+					appxfl = ObjectUtils.getMapValue(resources, PATH_APPXMANIFESTXML);
+					if (appxfl == null) {
+						taskcontext.abortExecution(new MissingRequiredParameterException(
+								"No AppxManifest.xml specified.", taskcontext.getTaskId()));
+						return null;
+					}
+				} else {
+					FileLocation prevappx = resources.put(PATH_APPXMANIFESTXML, appxfl);
+					if (prevappx != null && !prevappx.equals(appxfl)) {
+						taskcontext.abortExecution(new IllegalArgumentException(
+								"Multiple AppxManifest.xml files specified: " + prevappx + " and " + appxfl));
+						return null;
+					}
+				}
 
 				SakerPath outputpath;
 				if (outputOption != null) {
-					if (!outputOption.isForwardRelative()) {
-						throw new InvalidPathFormatException("Output" + " must be forward relative: " + outputOption);
-					}
-					if (outputOption.getFileName() == null) {
-						throw new InvalidPathFormatException("Output" + " must have a file name: " + outputOption);
-					}
-					outputpath = outputOption;
+					TaskOptionUtils.requireForwardRelativePathWithFileName(outputOption, "Output");
+					outputpath = SakerPath.valueOf(TASK_NAME).resolve(outputOption);
 				} else {
-					outputpath = inferOutputPathFromAppxManifest(taskcontext, appxfl);
-				}
-				NavigableMap<SakerPath, FileLocation> resources = new TreeMap<>();
-
-				resources.put(SakerPath.valueOf("AppxManifest.xml"), appxfl);
-				if (!ObjectUtils.isNullOrEmpty(filesOption)) {
-					for (MultiFileLocationTaskOption fo : filesOption) {
-						for (FileLocation fl : TaskOptionUtils.toFileLocations(fo, taskcontext, null)) {
-							fl.accept(new FileLocationVisitor() {
-								@Override
-								public void visit(ExecutionFileLocation loc) {
-									SakerPath locpath = loc.getPath();
-
-									NavigableMap<SakerPath, SakerFile> dirfiles = taskcontext.getTaskUtilities()
-											.collectFilesReportAdditionDependency(null,
-													RecursiveFileCollectionStrategy.create(locpath));
-									if (dirfiles.isEmpty()) {
-										//not a directory
-										resources.put(SakerPath.valueOf(locpath.getFileName()), fl);
-										return;
-									}
-									int subpathidx = Math.max(locpath.getNameCount() - 1, 0);
-									for (SakerPath path : dirfiles.keySet()) {
-										resources.put(path.subPath(subpathidx), ExecutionFileLocation.create(path));
-									}
-									taskcontext.getTaskUtilities().reportInputFileDependency(null,
-											ObjectUtils.singleValueMap(dirfiles.navigableKeySet(),
-													CommonTaskContentDescriptors.PRESENT));
-								}
-							});
-						}
-					}
+					outputpath = SakerPath.valueOf(TASK_NAME)
+							.resolve(inferOutputPathFromAppxManifest(taskcontext, appxfl));
 				}
 
-				PrepareAppxWorkerTaskIdentifier workertaskid = new PrepareAppxWorkerTaskIdentifier(outputpath);
 				PrepareAppxWorkerTaskFactory workertask = new PrepareAppxWorkerTaskFactory(resources);
+				PrepareAppxWorkerTaskIdentifier workertaskid = new PrepareAppxWorkerTaskIdentifier(outputpath);
 				taskcontext.startTask(workertaskid, workertask, null);
 
 				SimpleStructuredObjectTaskResult result = new SimpleStructuredObjectTaskResult(workertaskid);
@@ -133,7 +121,7 @@ public class PrepareAppxTaskFactory extends FrontendTaskFactory<Object> {
 			public void visit(LocalFileLocation loc) {
 				ContentDescriptor cd = taskcontext.getTaskUtilities().getReportExecutionDependency(SakerStandardUtils
 						.createLocalFileContentDescriptorExecutionProperty(loc.getLocalPath(), UUID.randomUUID()));
-				if (cd == null) {
+				if (cd == null || cd instanceof DirectoryContentDescriptor) {
 					throw ObjectUtils.sneakyThrow(
 							new NoSuchFileException("Specified AppxManifest is not a file: " + loc.getLocalPath()));
 				}
@@ -146,13 +134,15 @@ public class PrepareAppxTaskFactory extends FrontendTaskFactory<Object> {
 
 			@Override
 			public void visit(ExecutionFileLocation loc) {
-				SakerFile f = taskcontext.getTaskUtilities().resolveFileAtPath(loc.getPath());
+				SakerPath path = loc.getPath();
+				SakerFile f = taskcontext.getTaskUtilities().resolveFileAtPath(path);
 				if (f == null) {
-					taskcontext.reportInputFileDependency(null, loc.getPath(),
+					taskcontext.reportInputFileDependency(DEP_TAG_APPXMANIFESTXML_CONTENTS, path,
 							CommonTaskContentDescriptors.IS_NOT_FILE);
-					throw ObjectUtils.sneakyThrow(
-							new NoSuchFileException("Specified AppxManifest is not a file: " + loc.getPath()));
+					throw ObjectUtils
+							.sneakyThrow(new NoSuchFileException("Specified AppxManifest is not a file: " + path));
 				}
+				taskcontext.reportInputFileDependency(DEP_TAG_APPXMANIFESTXML_CONTENTS, path, f.getContentDescriptor());
 				try (InputStream is = f.openInputStream()) {
 					result[0] = inferOutputPathFromAppxManifestStream(is);
 				} catch (Exception e) {
