@@ -55,7 +55,6 @@ final class PrepareAppxWorkerTaskOutputImpl implements Externalizable, PrepareAp
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((appxDirectory == null) ? 0 : appxDirectory.hashCode());
-		result = prime * result + ((mappings == null) ? 0 : mappings.hashCode());
 		return result;
 	}
 
@@ -83,7 +82,6 @@ final class PrepareAppxWorkerTaskOutputImpl implements Externalizable, PrepareAp
 
 	@Override
 	public String toString() {
-		return "PrepareAppxWorkerTaskOutputImpl[" + (appxDirectory != null ? "appxDirectory=" + appxDirectory : "")
-				+ "]";
+		return getClass().getSimpleName() + "[" + appxDirectory + "]";
 	}
 }

@@ -61,8 +61,7 @@ public class PrepareAppxWorkerTaskFactory
 					}
 				});
 
-		PrepareAppxWorkerTaskOutputImpl result = new PrepareAppxWorkerTaskOutputImpl(diroutpath,
-				ImmutableUtils.makeImmutableNavigableMap(mappingpaths));
+		PrepareAppxWorkerTaskOutputImpl result = new PrepareAppxWorkerTaskOutputImpl(diroutpath, mappingpaths);
 		taskcontext.reportSelfTaskOutputChangeDetector(new EqualityTaskOutputChangeDetector(result));
 		return result;
 	}

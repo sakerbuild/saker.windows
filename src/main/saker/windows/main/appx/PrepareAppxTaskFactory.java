@@ -119,13 +119,14 @@ public class PrepareAppxTaskFactory extends FrontendTaskFactory<Object> {
 		fl.accept(new FileLocationVisitor() {
 			@Override
 			public void visit(LocalFileLocation loc) {
-				ContentDescriptor cd = taskcontext.getTaskUtilities().getReportExecutionDependency(SakerStandardUtils
-						.createLocalFileContentDescriptorExecutionProperty(loc.getLocalPath(), UUID.randomUUID()));
+				SakerPath path = loc.getLocalPath();
+				ContentDescriptor cd = taskcontext.getTaskUtilities().getReportExecutionDependency(
+						SakerStandardUtils.createLocalFileContentDescriptorExecutionProperty(path, UUID.randomUUID()));
 				if (cd == null || cd instanceof DirectoryContentDescriptor) {
-					throw ObjectUtils.sneakyThrow(
-							new NoSuchFileException("Specified AppxManifest is not a file: " + loc.getLocalPath()));
+					throw ObjectUtils
+							.sneakyThrow(new NoSuchFileException("Specified AppxManifest is not a file: " + path));
 				}
-				try (InputStream is = LocalFileProvider.getInstance().openInputStream(loc.getLocalPath())) {
+				try (InputStream is = LocalFileProvider.getInstance().openInputStream(path)) {
 					result[0] = inferOutputPathFromAppxManifestStream(is);
 				} catch (Exception e) {
 					throw ObjectUtils.sneakyThrow(e);
