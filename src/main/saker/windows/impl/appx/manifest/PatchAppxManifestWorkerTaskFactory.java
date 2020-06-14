@@ -121,9 +121,8 @@ public class PatchAppxManifestWorkerTaskFactory implements TaskFactory<Object>, 
 			}
 		});
 
-		SakerDirectory outputdir = taskcontext.getTaskUtilities().resolveDirectoryAtRelativePathCreate(SakerPathFiles
-				.requireBuildDirectory(taskcontext).getDirectoryCreate(PatchAppxManifestTaskFactory.TASK_NAME),
-				outputrelativepath.getParent());
+		SakerDirectory outputdir = taskcontext.getTaskUtilities().resolveDirectoryAtRelativePathCreate(
+				SakerPathFiles.requireBuildDirectory(taskcontext), outputrelativepath.getParent());
 
 		outputdir.add(addfile[0]);
 		SakerPath outputfilesakerpath = addfile[0].getSakerPath();

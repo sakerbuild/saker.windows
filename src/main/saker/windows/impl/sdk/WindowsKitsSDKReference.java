@@ -148,6 +148,16 @@ public class WindowsKitsSDKReference implements SDKReference, Externalizable {
 			case SakerWindowsUtils.SDK_WINDOWSKITS_PATH_RC_ARM64: {
 				return baseDirectory.resolve("bin", version, "arm64", "rc.exe");
 			}
+			
+			case SakerWindowsUtils.SDK_WINDOWSKITS_PATH_FXC_X86: {
+				return baseDirectory.resolve("bin", version, "x86", "fxc.exe");
+			}
+			case SakerWindowsUtils.SDK_WINDOWSKITS_PATH_FXC_X64: {
+				return baseDirectory.resolve("bin", version, "x64", "fxc.exe");
+			}
+			case SakerWindowsUtils.SDK_WINDOWSKITS_PATH_FXC_ARM64: {
+				return baseDirectory.resolve("bin", version, "arm64", "fxc.exe");
+			}
 
 			case SakerWindowsUtils.SDK_WINDOWSKITS_PATH_APPXLAUNCHER: {
 				return baseDirectory.resolve("App Certification Kit",

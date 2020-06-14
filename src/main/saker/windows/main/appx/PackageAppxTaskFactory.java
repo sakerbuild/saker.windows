@@ -52,7 +52,7 @@ public class PackageAppxTaskFactory extends FrontendTaskFactory<Object> {
 					TaskOptionUtils.requireForwardRelativePathWithFileName(outputOption, "Output");
 					outputpath = SakerPath.valueOf(TASK_NAME).resolve(outputOption);
 				} else {
-					outputpath = inputOption.inferRelativeOutput(taskcontext);
+					outputpath = SakerPath.valueOf(TASK_NAME).resolve(inputOption.inferRelativeOutput(taskcontext));
 				}
 
 				PackageAppxWorkerTaskIdentifier workertaskid = new PackageAppxWorkerTaskIdentifier(outputpath);

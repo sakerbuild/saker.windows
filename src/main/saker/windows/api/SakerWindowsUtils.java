@@ -55,6 +55,10 @@ public class SakerWindowsUtils {
 	public static final String SDK_WINDOWSKITS_PATH_RC_X86 = "exe.x86.rc";
 	public static final String SDK_WINDOWSKITS_PATH_RC_X64 = "exe.x64.rc";
 	public static final String SDK_WINDOWSKITS_PATH_RC_ARM64 = "exe.arm64.rc";
+	
+	public static final String SDK_WINDOWSKITS_PATH_FXC_X86 = "exe.x86.fxc";
+	public static final String SDK_WINDOWSKITS_PATH_FXC_X64 = "exe.x64.fxc";
+	public static final String SDK_WINDOWSKITS_PATH_FXC_ARM64 = "exe.arm64.fxc";
 
 	public static final String SDK_WINDOWSKITS_PROPERTY_VERSION = "version";
 

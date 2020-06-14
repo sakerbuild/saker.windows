@@ -70,7 +70,8 @@ public class BundleAppxTaskFactory extends FrontendTaskFactory<Object> {
 					TaskOptionUtils.requireForwardRelativePathWithFileName(outputOption, "Output");
 					outputpath = SakerPath.valueOf(TASK_NAME).resolve(outputOption);
 				} else {
-					outputpath = inferDefaultAppxBundleOutputPathFromInputPaths(mappings.navigableKeySet());
+					outputpath = SakerPath.valueOf(TASK_NAME)
+							.resolve(inferDefaultAppxBundleOutputPathFromInputPaths(mappings.navigableKeySet()));
 				}
 
 				BundleAppxWorkerTaskIdentifier workertaskid = new BundleAppxWorkerTaskIdentifier(outputpath);

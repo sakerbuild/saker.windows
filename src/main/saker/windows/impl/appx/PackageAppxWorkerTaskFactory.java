@@ -5,9 +5,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.NavigableMap;
 
-import saker.build.file.SakerDirectory;
 import saker.build.file.path.SakerPath;
-import saker.build.file.provider.SakerPathFiles;
 import saker.build.runtime.execution.SakerLog;
 import saker.build.task.TaskContext;
 import saker.build.thirdparty.saker.util.ImmutableUtils;
@@ -46,11 +44,6 @@ public class PackageAppxWorkerTaskFactory
 
 		PackageAppxWorkerTaskOutputImpl result = new PackageAppxWorkerTaskOutputImpl(outputpath);
 		return result;
-	}
-
-	@Override
-	protected SakerDirectory getBaseOutputDirectory(TaskContext taskcontext) {
-		return SakerPathFiles.requireBuildDirectory(taskcontext).getDirectoryCreate(PackageAppxTaskFactory.TASK_NAME);
 	}
 
 	@Override

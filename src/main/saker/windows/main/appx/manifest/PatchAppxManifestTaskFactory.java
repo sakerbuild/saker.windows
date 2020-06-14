@@ -56,7 +56,7 @@ public class PatchAppxManifestTaskFactory extends FrontendTaskFactory<Object> {
 					TaskOptionUtils.requireForwardRelativePathWithFileName(outputOption, "Output");
 					outputpath = SakerPath.valueOf(TASK_NAME).resolve(outputOption);
 				} else {
-					outputpath = SakerPath.EMPTY;
+					outputpath = SakerPath.valueOf(TASK_NAME);
 					if (processorArchitectureOption != null) {
 						outputpath.resolve(processorArchitectureOption);
 					}

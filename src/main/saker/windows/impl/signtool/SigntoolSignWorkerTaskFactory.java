@@ -105,8 +105,7 @@ public class SigntoolSignWorkerTaskFactory
 		SakerPath relativeoutputpath = taskid.getRelativeOutput();
 		TaskExecutionUtilities taskutils = taskcontext.getTaskUtilities();
 		SakerDirectory outputdir = taskutils.resolveDirectoryAtRelativePathCreate(
-				SakerPathFiles.requireBuildDirectory(taskcontext).getDirectoryCreate(SigntoolSignTaskFactory.TASK_NAME),
-				relativeoutputpath.getParent());
+				SakerPathFiles.requireBuildDirectory(taskcontext), relativeoutputpath.getParent());
 
 		LocalFileProvider localfp = LocalFileProvider.getInstance();
 		//signtool overwrites the input so the actual input needs to be copied to the output path

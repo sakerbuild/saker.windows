@@ -19,6 +19,7 @@ import saker.build.file.SakerFile;
 import saker.build.file.content.ContentDescriptor;
 import saker.build.file.path.SakerPath;
 import saker.build.file.provider.LocalFileProvider;
+import saker.build.file.provider.SakerPathFiles;
 import saker.build.runtime.execution.ExecutionContext;
 import saker.build.task.Task;
 import saker.build.task.TaskContext;
@@ -68,8 +69,8 @@ public abstract class MakeAppxWithMappingsWorkerTaskFactoryBase<T> implements Ta
 
 		SakerPath relativeoutputpath = getRelativeOutputPath(taskcontext);
 		TaskExecutionUtilities taskutils = taskcontext.getTaskUtilities();
-		SakerDirectory outputdir = taskutils.resolveDirectoryAtRelativePathCreate(getBaseOutputDirectory(taskcontext),
-				relativeoutputpath.getParent());
+		SakerDirectory outputdir = taskutils.resolveDirectoryAtRelativePathCreate(
+				SakerPathFiles.requireBuildDirectory(taskcontext), relativeoutputpath.getParent());
 
 		NavigableMap<SakerPath, SakerPath> mirroredmappings = new TreeMap<>();
 		NavigableMap<SakerPath, ContentDescriptor> inputcontents = new TreeMap<>();
@@ -147,8 +148,6 @@ public abstract class MakeAppxWithMappingsWorkerTaskFactoryBase<T> implements Ta
 			SakerPath makeappxpath);
 
 	protected abstract T getResult(SakerPath outputpath);
-
-	protected abstract SakerDirectory getBaseOutputDirectory(TaskContext taskcontext);
 
 	protected abstract SakerPath getRelativeOutputPath(TaskContext taskcontext);
 

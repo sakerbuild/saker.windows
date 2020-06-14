@@ -65,7 +65,8 @@ public class SigntoolSignTaskFactory extends FrontendTaskFactory<Object> {
 					TaskOptionUtils.requireForwardRelativePathWithFileName(outputOption, "Output");
 					outputpath = SakerPath.valueOf(TASK_NAME).resolve(outputOption);
 				} else {
-					outputpath = SakerPath.valueOf(SakerStandardUtils.getFileLocationFileName(inputfl));
+					outputpath = SakerPath.valueOf(TASK_NAME)
+							.resolve(SakerStandardUtils.getFileLocationFileName(inputfl));
 				}
 
 				SigntoolSignWorkerTaskIdentifier workertaskid = new SigntoolSignWorkerTaskIdentifier(outputpath);
