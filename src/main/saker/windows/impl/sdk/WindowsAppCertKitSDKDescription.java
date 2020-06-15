@@ -10,6 +10,7 @@ import saker.build.thirdparty.saker.util.ObjectUtils;
 import saker.sdk.support.api.EnvironmentSDKDescription;
 import saker.sdk.support.api.SDKReference;
 
+//XXX why is this a subclass instead of using EnvironmentSDKDescription.create ?
 public class WindowsAppCertKitSDKDescription implements EnvironmentSDKDescription, Externalizable {
 	private static final long serialVersionUID = 1L;
 
@@ -18,7 +19,8 @@ public class WindowsAppCertKitSDKDescription implements EnvironmentSDKDescriptio
 
 	@Override
 	public SDKReference getSDK(SakerEnvironment environment) throws Exception {
-		return environment.getEnvironmentPropertyCurrentValue(new WindowsAppCertKitSDKReferenceEnvironmentProperty());
+		return environment
+				.getEnvironmentPropertyCurrentValue(WindowsAppCertKitSDKReferenceEnvironmentProperty.INSTANCE);
 	}
 
 	@Override

@@ -15,6 +15,10 @@ import saker.build.task.utils.annot.SakerInput;
 import saker.build.task.utils.dependencies.EqualityTaskOutputChangeDetector;
 import saker.build.thirdparty.saker.util.io.FileUtils;
 import saker.build.trace.BuildTrace;
+import saker.nest.scriptinfo.reflection.annot.NestInformation;
+import saker.nest.scriptinfo.reflection.annot.NestParameterInformation;
+import saker.nest.scriptinfo.reflection.annot.NestTaskInformation;
+import saker.nest.scriptinfo.reflection.annot.NestTypeUsage;
 import saker.nest.utils.FrontendTaskFactory;
 import saker.sdk.support.api.SDKDescription;
 import saker.sdk.support.main.SDKSupportFrontendUtils;
@@ -24,11 +28,38 @@ import saker.windows.api.appx.PackageAppxWorkerTaskOutput;
 import saker.windows.api.signtool.SigntoolSignWorkerTaskOutput;
 import saker.windows.impl.appx.BundleAppxWorkerTaskFactory;
 import saker.windows.impl.appx.BundleAppxWorkerTaskIdentifier;
+import saker.windows.main.TaskDocs;
+import saker.windows.main.TaskDocs.DocBundleAppxWorkerTaskOutput;
 
+@NestTaskInformation(returnType = @NestTypeUsage(DocBundleAppxWorkerTaskOutput.class))
+@NestInformation("Creates an .appxbundle consisting of multiple .appx packages.\n"
+		+ "The task is used to create an .appxbundle package that consists of multiple .appx applications. "
+		+ "It uses the makeappx tool to perform its operations.")
+
+@NestParameterInformation(value = "Mappings",
+		aliases = "",
+		required = true,
+		type = @NestTypeUsage(value = Map.class,
+				elementTypes = { BundleAppxTaskFactory.MappingKeyTaskOption.class, SakerPath.class }),
+		info = @NestInformation("Specifies the contents of the .appxbundle with mappings.\n"
+				+ "Each key in the parameter map is a path to a file that should be placed in the .appxbundle. The "
+				+ "corresponding keys are the paths that the entry should have in the resulting bundle.\n"
+				+ "If the keys are null or the empty path, it will be the name of the file.\n"
+				+ "If you intend to sign the output .appxbundle, you should also sign the .appx inputs before "
+				+ "creating the bundle."))
+@NestParameterInformation(value = "Output",
+		type = @NestTypeUsage(SakerPath.class),
+		info = @NestInformation("A forward relative output path that specifies the output location of the .appxbundle.\n"
+				+ "It can be used to have a better output location than the automatically generated one."))
+@NestParameterInformation(value = "SDKs",
+		type = @NestTypeUsage(value = Map.class,
+				elementTypes = { saker.sdk.support.main.TaskDocs.DocSdkNameOption.class,
+						SDKDescriptionTaskOption.class }),
+		info = @NestInformation(TaskDocs.SDKS))
 public class BundleAppxTaskFactory extends FrontendTaskFactory<Object> {
-	private static final SakerPath DEFAULT_OUTPUT_PATH = SakerPath.valueOf("default.appxbundle");
-
 	private static final long serialVersionUID = 1L;
+
+	private static final SakerPath DEFAULT_OUTPUT_PATH = SakerPath.valueOf("default.appxbundle");
 
 	public static final String TASK_NAME = "saker.appx.bundle";
 
@@ -36,7 +67,7 @@ public class BundleAppxTaskFactory extends FrontendTaskFactory<Object> {
 	public ParameterizableTask<? extends Object> createTask(ExecutionContext executioncontext) {
 		return new ParameterizableTask<Object>() {
 
-			@SakerInput(value = { "", "Mappigns" }, required = true)
+			@SakerInput(value = { "", "Mappings" }, required = true)
 			public Map<MappingKeyTaskOption, SakerPath> mappingsOption;
 
 			@SakerInput(value = { "SDKs" })
@@ -62,7 +93,7 @@ public class BundleAppxTaskFactory extends FrontendTaskFactory<Object> {
 					} else {
 						TaskOptionUtils.requireForwardRelativePathWithFileName(valpath, "Mapping target path");
 					}
-					mappings.put(keypath, valpath);
+					mappings.put(valpath, keypath);
 				}
 
 				SakerPath outputpath;
@@ -136,6 +167,7 @@ public class BundleAppxTaskFactory extends FrontendTaskFactory<Object> {
 		return minlen;
 	}
 
+	@NestInformation("Path of an input file that should be placed in the output .appxbundle.")
 	public static abstract class MappingKeyTaskOption {
 		public abstract SakerPath toSakerPath(TaskContext taskcontext);
 

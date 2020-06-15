@@ -27,7 +27,7 @@ import saker.sdk.support.api.exc.SDKPathNotFoundException;
 import saker.windows.api.SakerWindowsUtils;
 import saker.windows.main.appx.LaunchAppxTaskFactory;
 
-public abstract class LaunchAppxWorkerTaskFactory
+public abstract class LaunchAppxWorkerTaskFactoryBase
 		implements Task<Object>, TaskFactory<Object>, TaskIdentifier, Externalizable {
 	private static final long serialVersionUID = 1L;
 
@@ -36,7 +36,7 @@ public abstract class LaunchAppxWorkerTaskFactory
 	/**
 	 * For {@link Externalizable}.
 	 */
-	public LaunchAppxWorkerTaskFactory() {
+	public LaunchAppxWorkerTaskFactoryBase() {
 	}
 
 	public void setSdks(NavigableMap<String, SDKDescription> sdks) {
@@ -116,7 +116,7 @@ public abstract class LaunchAppxWorkerTaskFactory
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		LaunchAppxWorkerTaskFactory other = (LaunchAppxWorkerTaskFactory) obj;
+		LaunchAppxWorkerTaskFactoryBase other = (LaunchAppxWorkerTaskFactoryBase) obj;
 		if (sdks == null) {
 			if (other.sdks != null)
 				return false;

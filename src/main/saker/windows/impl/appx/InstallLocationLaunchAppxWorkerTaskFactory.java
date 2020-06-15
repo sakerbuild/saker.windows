@@ -12,7 +12,7 @@ import saker.build.task.TaskContext;
 import saker.build.thirdparty.saker.util.io.SerialUtils;
 import saker.sdk.support.api.SDKReference;
 
-public class InstallLocationLaunchAppxWorkerTaskFactory extends LaunchAppxWorkerTaskFactory {
+public class InstallLocationLaunchAppxWorkerTaskFactory extends LaunchAppxWorkerTaskFactoryBase {
 	private static final long serialVersionUID = 1L;
 
 	private SakerPath installLocation;

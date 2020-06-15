@@ -18,6 +18,10 @@ import saker.build.task.utils.annot.SakerInput;
 import saker.build.task.utils.dependencies.EqualityTaskOutputChangeDetector;
 import saker.build.thirdparty.saker.util.io.SerialUtils;
 import saker.build.trace.BuildTrace;
+import saker.nest.scriptinfo.reflection.annot.NestInformation;
+import saker.nest.scriptinfo.reflection.annot.NestParameterInformation;
+import saker.nest.scriptinfo.reflection.annot.NestTaskInformation;
+import saker.nest.scriptinfo.reflection.annot.NestTypeUsage;
 import saker.nest.utils.FrontendTaskFactory;
 import saker.std.api.file.location.ExecutionFileLocation;
 import saker.std.api.file.location.FileLocation;
@@ -26,7 +30,26 @@ import saker.std.api.file.location.LocalFileLocation;
 import saker.std.api.util.SakerStandardTaskUtils;
 import saker.windows.api.appx.PrepareAppxWorkerTaskOutput;
 import saker.windows.impl.appx.RegisterAppxWorkerTaskFactory;
+import saker.windows.main.TaskDocs.DocRegisterAppxWorkerTaskOutput;
 
+@NestTaskInformation(returnType = @NestTypeUsage(DocRegisterAppxWorkerTaskOutput.class))
+@NestInformation("Registers an appx package directory for the user.\n"
+		+ "The task adds the specified appx package so it can be launched by the user. This is useful when "
+		+ "developing Windows Store applications.\n"
+		+ "The registration takes place in-place, and the application files won't be copied to the build directory.")
+
+@NestParameterInformation(value = "Appx",
+		aliases = "",
+		type = @NestTypeUsage(RegisterAppxTaskFactory.AppxReferenceTaskOption.class),
+		info = @NestInformation("The appx package to register.\n"
+				+ "This parameter should be a path to the AppxManifest.xml file of the prepared application package. "
+				+ "The output of the " + PrepareAppxTaskFactory.TASK_NAME + "() task can also be specified.\n"
+				+ "All files related to the application will be mirrored to the local filesystem if necessary."))
+@NestParameterInformation(value = "AllowReinstall",
+		type = @NestTypeUsage(boolean.class),
+		info = @NestInformation("Specifies if reinstalling the application is allowed.\n"
+				+ "Setting this parameter to true will cause the task to reinstall the application "
+				+ "if the registration failed due to related errors."))
 public class RegisterAppxTaskFactory extends FrontendTaskFactory<Object> {
 	private static final long serialVersionUID = 1L;
 
@@ -48,7 +71,7 @@ public class RegisterAppxTaskFactory extends FrontendTaskFactory<Object> {
 					BuildTrace.classifyTask(BuildTrace.CLASSIFICATION_FRONTEND);
 				}
 
-				FileLocation appx = appxReferenceOption.getAppxManifest();
+				FileLocation appx = appxReferenceOption.getAppxManifest(taskcontext);
 
 				StructuredTaskResult[] appxpathtaskresult = { null };
 				appx.accept(new FileLocationVisitor() {
@@ -159,13 +182,37 @@ public class RegisterAppxTaskFactory extends FrontendTaskFactory<Object> {
 
 	}
 
+	@NestInformation("Reference to an AppxManifest.xml file of an application.\n"
+			+ "The option accepts paths to the AppxManifest.xml file, or the output of the "
+			+ PrepareAppxTaskFactory.TASK_NAME + "() task.\n")
 	public static abstract class AppxReferenceTaskOption {
-		public abstract FileLocation getAppxManifest();
+		public abstract FileLocation getAppxManifest(TaskContext taskcontext);
+
+		public static AppxReferenceTaskOption valueOf(SakerPath value) {
+			if (value.isAbsolute()) {
+				return valueOf(ExecutionFileLocation.create(value));
+			}
+			return new AppxReferenceTaskOption() {
+				@Override
+				public FileLocation getAppxManifest(TaskContext taskcontext) {
+					return ExecutionFileLocation.create(taskcontext.getTaskWorkingDirectoryPath().resolve(value));
+				}
+			};
+		}
+
+		public static AppxReferenceTaskOption valueOf(FileLocation value) {
+			return new AppxReferenceTaskOption() {
+				@Override
+				public FileLocation getAppxManifest(TaskContext taskcontext) {
+					return value;
+				}
+			};
+		}
 
 		public static AppxReferenceTaskOption valueOf(PrepareAppxWorkerTaskOutput value) {
 			return new AppxReferenceTaskOption() {
 				@Override
-				public FileLocation getAppxManifest() {
+				public FileLocation getAppxManifest(TaskContext taskcontext) {
 					return ExecutionFileLocation.create(value.getAppxDirectory().resolve("AppxManifest.xml"));
 				}
 			};

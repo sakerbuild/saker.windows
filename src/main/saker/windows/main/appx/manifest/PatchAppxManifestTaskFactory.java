@@ -13,13 +13,41 @@ import saker.build.task.utils.dependencies.EqualityTaskOutputChangeDetector;
 import saker.build.thirdparty.saker.util.ImmutableUtils;
 import saker.build.thirdparty.saker.util.StringUtils;
 import saker.build.trace.BuildTrace;
+import saker.nest.scriptinfo.reflection.annot.NestInformation;
+import saker.nest.scriptinfo.reflection.annot.NestParameterInformation;
+import saker.nest.scriptinfo.reflection.annot.NestTaskInformation;
+import saker.nest.scriptinfo.reflection.annot.NestTypeUsage;
 import saker.nest.utils.FrontendTaskFactory;
 import saker.std.api.file.location.FileLocation;
 import saker.std.main.file.option.FileLocationTaskOption;
 import saker.std.main.file.utils.TaskOptionUtils;
 import saker.windows.impl.appx.manifest.PatchAppxManifestWorkerTaskFactory;
 import saker.windows.impl.appx.manifest.PatchAppxManifestWorkerTaskIdentifier;
+import saker.windows.main.TaskDocs.DocAppxProcessorArchitecture;
+import saker.windows.main.TaskDocs.DocPatchAppxManifestWorkerTaskOutput;
 
+@NestTaskInformation(returnType = @NestTypeUsage(DocPatchAppxManifestWorkerTaskOutput.class))
+@NestInformation("Patches some values in the specified AppxManifest.xml.\n"
+		+ "The task can be used to replace, insert, or modify some values in the specified AppxManifest.xml file.")
+
+@NestParameterInformation(value = "AppxManifest",
+		aliases = { "", "Manifest" },
+		required = true,
+		type = @NestTypeUsage(FileLocationTaskOption.class),
+		info = @NestInformation("The input AppxManifest.xml file that should be patched."))
+@NestParameterInformation(value = "ProcessorArchitecture",
+		type = @NestTypeUsage(DocAppxProcessorArchitecture.class),
+		info = @NestInformation("Specified the value that should be set for the "
+				+ "Package/Identity:ProcessorArchitecture attribute."))
+@NestParameterInformation(value = "Version",
+		type = @NestTypeUsage(String.class),
+		info = @NestInformation("Specified the value that should be set for the "
+				+ "Package/Identity:Version attribute."))
+
+@NestParameterInformation(value = "Output",
+		type = @NestTypeUsage(SakerPath.class),
+		info = @NestInformation("A forward relative output path that specifies the output location of the output patched manifest file.\n"
+				+ "It can be used to have a better output location than the automatically generated one."))
 public class PatchAppxManifestTaskFactory extends FrontendTaskFactory<Object> {
 	private static final long serialVersionUID = 1L;
 

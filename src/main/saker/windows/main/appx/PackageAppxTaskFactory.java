@@ -12,6 +12,10 @@ import saker.build.task.utils.annot.SakerInput;
 import saker.build.task.utils.dependencies.EqualityTaskOutputChangeDetector;
 import saker.build.thirdparty.saker.util.StringUtils;
 import saker.build.trace.BuildTrace;
+import saker.nest.scriptinfo.reflection.annot.NestInformation;
+import saker.nest.scriptinfo.reflection.annot.NestParameterInformation;
+import saker.nest.scriptinfo.reflection.annot.NestTaskInformation;
+import saker.nest.scriptinfo.reflection.annot.NestTypeUsage;
 import saker.nest.utils.FrontendTaskFactory;
 import saker.sdk.support.api.SDKDescription;
 import saker.sdk.support.main.SDKSupportFrontendUtils;
@@ -20,7 +24,31 @@ import saker.std.main.file.utils.TaskOptionUtils;
 import saker.windows.api.appx.PrepareAppxWorkerTaskOutput;
 import saker.windows.impl.appx.PackageAppxWorkerTaskFactory;
 import saker.windows.impl.appx.PackageAppxWorkerTaskIdentifier;
+import saker.windows.main.TaskDocs;
+import saker.windows.main.TaskDocs.DocPackageAppxWorkerTaskOutput;
 
+@NestTaskInformation(returnType = @NestTypeUsage(DocPackageAppxWorkerTaskOutput.class))
+@NestInformation("Creates an .appx package from the prepared application directory.\n"
+		+ "The task creates an .appx archive from the prepared application contents. It expects the " + "output of the "
+		+ PrepareAppxTaskFactory.TASK_NAME + "() task as its input.\n"
+		+ "The task uses the makeappx tool to perform its operations.")
+
+@NestParameterInformation(value = "Input",
+		aliases = "",
+		required = true,
+		type = @NestTypeUsage(PackageAppxTaskFactory.AppxInputTaskOption.class),
+		info = @NestInformation("Specifies the contents of the .appx package.\n"
+				+ "The parameter expects the output of the " + PrepareAppxTaskFactory.TASK_NAME
+				+ "() task as the input."))
+@NestParameterInformation(value = "Output",
+		type = @NestTypeUsage(SakerPath.class),
+		info = @NestInformation("A forward relative output path that specifies the output location of the .appx bundle.\n"
+				+ "It can be used to have a better output location than the automatically generated one."))
+@NestParameterInformation(value = "SDKs",
+		type = @NestTypeUsage(value = Map.class,
+				elementTypes = { saker.sdk.support.main.TaskDocs.DocSdkNameOption.class,
+						SDKDescriptionTaskOption.class }),
+		info = @NestInformation(TaskDocs.SDKS))
 public class PackageAppxTaskFactory extends FrontendTaskFactory<Object> {
 	private static final long serialVersionUID = 1L;
 
@@ -67,6 +95,8 @@ public class PackageAppxTaskFactory extends FrontendTaskFactory<Object> {
 		};
 	}
 
+	@NestInformation("Input .appx contents.\n" + "The option expects the output of the "
+			+ PrepareAppxTaskFactory.TASK_NAME + "() task.")
 	public static abstract class AppxInputTaskOption {
 		public abstract NavigableMap<SakerPath, SakerPath> getMappings(TaskContext taskcontext);
 

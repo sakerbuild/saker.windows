@@ -76,13 +76,13 @@ public abstract class MakeAppxWithMappingsWorkerTaskFactoryBase<T> implements Ta
 		NavigableMap<SakerPath, ContentDescriptor> inputcontents = new TreeMap<>();
 		//TODO this should be done more efficiently in bulk
 		for (Entry<SakerPath, SakerPath> entry : mappings.entrySet()) {
-			SakerPath fpath = entry.getKey();
+			SakerPath fpath = entry.getValue();
 			SakerFile f = taskutils.resolveAtPath(fpath);
 			if (f == null) {
 				throw new FileNotFoundException(fpath.toString());
 			}
 			Path mirroredpath = taskcontext.mirror(f, DirectoryVisitPredicate.synchronizeNothing());
-			mirroredmappings.put(SakerPath.valueOf(mirroredpath), entry.getValue());
+			mirroredmappings.put(SakerPath.valueOf(mirroredpath), entry.getKey());
 			inputcontents.put(fpath, f.getContentDescriptor());
 		}
 		taskutils.reportInputFileDependency(null, inputcontents);

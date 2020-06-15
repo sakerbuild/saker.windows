@@ -57,7 +57,7 @@ public class PrepareAppxWorkerTaskFactory
 				new SetTransformingNavigableMap<SakerPath, SakerPath, SakerPath>(outfilepaths) {
 					@Override
 					protected Entry<SakerPath, SakerPath> transformEntry(SakerPath e) {
-						return ImmutableUtils.makeImmutableMapEntry(e, e.subPath(diroutnamecount));
+						return ImmutableUtils.makeImmutableMapEntry(e.subPath(diroutnamecount), e);
 					}
 				});
 

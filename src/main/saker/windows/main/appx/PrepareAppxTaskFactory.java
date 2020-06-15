@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.nio.file.NoSuchFileException;
 import java.util.Collection;
 import java.util.NavigableMap;
+import java.util.StringJoiner;
 import java.util.TreeMap;
 import java.util.UUID;
 
@@ -30,6 +31,10 @@ import saker.build.task.utils.annot.SakerInput;
 import saker.build.task.utils.dependencies.EqualityTaskOutputChangeDetector;
 import saker.build.thirdparty.saker.util.ObjectUtils;
 import saker.build.trace.BuildTrace;
+import saker.nest.scriptinfo.reflection.annot.NestInformation;
+import saker.nest.scriptinfo.reflection.annot.NestParameterInformation;
+import saker.nest.scriptinfo.reflection.annot.NestTaskInformation;
+import saker.nest.scriptinfo.reflection.annot.NestTypeUsage;
 import saker.nest.utils.FrontendTaskFactory;
 import saker.std.api.file.location.ExecutionFileLocation;
 import saker.std.api.file.location.FileLocation;
@@ -41,7 +46,28 @@ import saker.std.main.file.option.FileLocationTaskOption;
 import saker.std.main.file.utils.TaskOptionUtils;
 import saker.windows.impl.appx.PrepareAppxWorkerTaskFactory;
 import saker.windows.impl.appx.PrepareAppxWorkerTaskIdentifier;
+import saker.windows.main.TaskDocs.DocPrepareAppxWorkerTaskOutput;
 
+@NestTaskInformation(returnType = @NestTypeUsage(DocPrepareAppxWorkerTaskOutput.class))
+@NestInformation("Prepares appx application contents into an output directory.\n"
+		+ "The task is used to set up the content hierarchy for an application.\n"
+		+ "The task requires an AppxManifest.xml to be specified in the root directory.")
+
+@NestParameterInformation(value = "AppxManifest",
+		type = @NestTypeUsage(FileLocationTaskOption.class),
+		info = @NestInformation("Specifies the AppxManifest.xml for the application.\n"
+				+ "The file set for this parameter will be placed into the application directory "
+				+ "with the AppxManifest.xml name.\n"
+				+ "You don't need to use this parameter if you already specify an AppxManifest.xml using "
+				+ "the Contents parameter."))
+@NestParameterInformation(value = "Contents",
+		type = @NestTypeUsage(value = Collection.class, elementTypes = { RelativeContentsTaskOption.class }),
+		info = @NestInformation("Specifies the file contents of the application.\n"
+				+ "All file contents of the application should be specified for this parameter."))
+@NestParameterInformation(value = "Output",
+		type = @NestTypeUsage(SakerPath.class),
+		info = @NestInformation("A forward relative output path that specifies the output location of the application contents.\n"
+				+ "It can be used to have a better output location than the automatically generated one."))
 public class PrepareAppxTaskFactory extends FrontendTaskFactory<Object> {
 	private static final SakerPath PATH_APPXMANIFESTXML = SakerPath.valueOf("AppxManifest.xml");
 	private static final Object DEP_TAG_APPXMANIFESTXML_CONTENTS = PATH_APPXMANIFESTXML;
@@ -177,17 +203,21 @@ public class PrepareAppxTaskFactory extends FrontendTaskFactory<Object> {
 			String name = elem.getAttribute("Name");
 			String version = elem.getAttribute("Version");
 			String arch = elem.getAttribute("ProcessorArchitecture");
-			SakerPath p = SakerPath.valueOf(name);
+			StringJoiner joiner = new StringJoiner("_");
+			if (!ObjectUtils.isNullOrEmpty(name)) {
+				joiner.add(name);
+			}
 			if (!ObjectUtils.isNullOrEmpty(version)) {
-				p = p.resolve(version);
+				joiner.add(version);
 			}
 			if (!ObjectUtils.isNullOrEmpty(arch)) {
-				p = p.resolve(arch);
+				joiner.add(arch);
 			}
-			if (SakerPath.EMPTY.equals(p)) {
-				p = SakerPath.valueOf("default");
+			String joined = joiner.toString();
+			if (ObjectUtils.isNullOrEmpty(joined)) {
+				joined = "default";
 			}
-			return p;
+			return SakerPath.valueOf(joined);
 		}
 		throw new IllegalArgumentException("Identity element not found in AppxManifest.");
 	}

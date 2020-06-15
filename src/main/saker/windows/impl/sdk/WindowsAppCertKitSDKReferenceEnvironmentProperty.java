@@ -19,6 +19,8 @@ public class WindowsAppCertKitSDKReferenceEnvironmentProperty
 		implements EnvironmentProperty<SDKReference>, Externalizable {
 	private static final long serialVersionUID = 1L;
 
+	public static final WindowsAppCertKitSDKReferenceEnvironmentProperty INSTANCE = new WindowsAppCertKitSDKReferenceEnvironmentProperty();
+
 	public WindowsAppCertKitSDKReferenceEnvironmentProperty() {
 	}
 

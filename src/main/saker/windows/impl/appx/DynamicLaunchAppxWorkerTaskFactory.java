@@ -17,7 +17,7 @@ import saker.windows.impl.SakerWindowsImplUtils;
 import saker.windows.impl.thirdparty.org.json.JSONArray;
 import saker.windows.impl.thirdparty.org.json.JSONObject;
 
-public class DynamicLaunchAppxWorkerTaskFactory extends LaunchAppxWorkerTaskFactory {
+public class DynamicLaunchAppxWorkerTaskFactory extends LaunchAppxWorkerTaskFactoryBase {
 	private static final long serialVersionUID = 1L;
 
 	private String input;

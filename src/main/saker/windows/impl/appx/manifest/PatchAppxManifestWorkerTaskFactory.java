@@ -186,6 +186,11 @@ public class PatchAppxManifestWorkerTaskFactory implements TaskFactory<Object>, 
 	}
 
 	private static class AppxManifestPatchingSakerFile extends SakerFileBase {
+		private static final String ELEM_PACKAGE = "Package";
+		private static final String ELEM_IDENTITY = "Identity";
+		private static final String ATTR_VERSION = "Version";
+		private static final String ATTR_PROCESSOR_ARCHITECTURE = "ProcessorArchitecture";
+
 		private IOSupplier<? extends InputStream> inputSupplier;
 		private PatchedAppxManifestContentDescriptor contentDescriptor;
 
@@ -230,7 +235,7 @@ public class PatchAppxManifestWorkerTaskFactory implements TaskFactory<Object>, 
 
 		private void patchAppxManifestXml(Document doc) {
 			Element rootelem = doc.getDocumentElement();
-			if (!"Package".equals(rootelem.getLocalName())) {
+			if (!ELEM_PACKAGE.equals(rootelem.getLocalName())) {
 				throw new IllegalArgumentException(
 						"Invalid AppxManifest.xml, expected Package root element instead of " + rootelem.getNodeName());
 			}
@@ -244,7 +249,7 @@ public class PatchAppxManifestWorkerTaskFactory implements TaskFactory<Object>, 
 				if (item.getNodeType() != Node.ELEMENT_NODE) {
 					continue;
 				}
-				if (!"Identity".equals(item.getLocalName())) {
+				if (!ELEM_IDENTITY.equals(item.getLocalName())) {
 					continue;
 				}
 				String elemns = item.getNamespaceURI();
@@ -255,17 +260,17 @@ public class PatchAppxManifestWorkerTaskFactory implements TaskFactory<Object>, 
 				String prefix = elem.getPrefix();
 				if (prefix == null) {
 					if (arch != null) {
-						elem.setAttribute("ProcessorArchitecture", arch);
+						elem.setAttribute(ATTR_PROCESSOR_ARCHITECTURE, arch);
 					}
 					if (version != null) {
-						elem.setAttribute("Version", version);
+						elem.setAttribute(ATTR_VERSION, version);
 					}
 				} else {
 					if (arch != null) {
-						elem.setAttribute(prefix + ":ProcessorArchitecture", arch);
+						elem.setAttribute(prefix + ":" + ATTR_PROCESSOR_ARCHITECTURE, arch);
 					}
 					if (version != null) {
-						elem.setAttribute(prefix + ":Version", version);
+						elem.setAttribute(prefix + ":" + ATTR_VERSION, version);
 					}
 				}
 				return;
@@ -356,6 +361,14 @@ public class PatchAppxManifestWorkerTaskFactory implements TaskFactory<Object>, 
 			} else if (!version.equals(other.version))
 				return false;
 			return true;
+		}
+
+		@Override
+		public String toString() {
+			return "PatchedAppxManifestContentDescriptor["
+					+ (processorArchitecture != null ? "processorArchitecture=" + processorArchitecture + ", " : "")
+					+ (version != null ? "version=" + version + ", " : "")
+					+ (originalContents != null ? "originalContents=" + originalContents : "") + "]";
 		}
 
 	}
