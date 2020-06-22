@@ -14,6 +14,7 @@ public class TaskDocs {
 			+ "The SDK names are compared in a case-insensitive way.";
 
 	@NestTypeInformation(qualifiedName = "PatchAppxManifestWorkerTaskOutput")
+	@NestInformation("Output of the AppxManifest.xml patching task.")
 	@NestFieldInformation(value = "Path",
 			type = @NestTypeUsage(SakerPath.class),
 			info = @NestInformation("The output path of the patched AppxManifest.xml"))

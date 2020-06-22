@@ -93,6 +93,10 @@ public class LaunchAppxTaskFactory extends FrontendTaskFactory<Object> {
 		}
 	}
 
+	@NestInformation("Input appx to launch.\n" + "The option accepts the output of the "
+			+ RegisterAppxTaskFactory.TASK_NAME
+			+ "() task as well as a local file location to an AppxManifest.xml for the application.\n"
+			+ "An Application User Model ID can also be used to specify the application to start.")
 	public static abstract class LaunchAppxInputTaskOption {
 		public abstract LaunchAppxWorkerTaskFactoryBase createTask(TaskContext taskcontext, TaskImpl task);
 

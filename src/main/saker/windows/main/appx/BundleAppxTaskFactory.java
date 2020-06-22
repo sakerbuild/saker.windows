@@ -43,8 +43,8 @@ import saker.windows.main.TaskDocs.DocBundleAppxWorkerTaskOutput;
 				elementTypes = { BundleAppxTaskFactory.MappingKeyTaskOption.class, SakerPath.class }),
 		info = @NestInformation("Specifies the contents of the .appxbundle with mappings.\n"
 				+ "Each key in the parameter map is a path to a file that should be placed in the .appxbundle. The "
-				+ "corresponding keys are the paths that the entry should have in the resulting bundle.\n"
-				+ "If the keys are null or the empty path, it will be the name of the file.\n"
+				+ "corresponding values are the paths that the entry should have in the resulting bundle.\n"
+				+ "If a value is null or the empty path, it will be the name of the file.\n"
 				+ "If you intend to sign the output .appxbundle, you should also sign the .appx inputs before "
 				+ "creating the bundle."))
 @NestParameterInformation(value = "Output",
@@ -102,7 +102,7 @@ public class BundleAppxTaskFactory extends FrontendTaskFactory<Object> {
 					outputpath = SakerPath.valueOf(TASK_NAME).resolve(outputOption);
 				} else {
 					outputpath = SakerPath.valueOf(TASK_NAME)
-							.resolve(inferDefaultAppxBundleOutputPathFromInputPaths(mappings.navigableKeySet()));
+							.resolve(inferDefaultAppxBundleOutputPathFromInputPaths(mappings.values()));
 				}
 
 				BundleAppxWorkerTaskIdentifier workertaskid = new BundleAppxWorkerTaskIdentifier(outputpath);
