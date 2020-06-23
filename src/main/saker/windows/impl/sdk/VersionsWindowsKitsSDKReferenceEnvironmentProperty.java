@@ -19,20 +19,26 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Predicate;
 
+import saker.build.exception.PropertyComputationFailedException;
 import saker.build.file.path.SakerPath;
-import saker.build.runtime.environment.EnvironmentProperty;
 import saker.build.runtime.environment.SakerEnvironment;
+import saker.build.thirdparty.saker.util.ImmutableUtils;
+import saker.build.thirdparty.saker.util.StringUtils;
 import saker.build.thirdparty.saker.util.io.SerialUtils;
+import saker.build.trace.BuildTrace;
+import saker.build.trace.TraceContributorEnvironmentProperty;
 import saker.sdk.support.api.SDKReference;
 import saker.sdk.support.api.exc.SDKNotFoundException;
+import saker.windows.api.SakerWindowsUtils;
 import saker.windows.impl.SakerWindowsImplUtils;
 
 public class VersionsWindowsKitsSDKReferenceEnvironmentProperty
-		implements EnvironmentProperty<SDKReference>, Externalizable {
+		implements TraceContributorEnvironmentProperty<SDKReference>, Externalizable {
 	private static final long serialVersionUID = 1L;
 
 	public static final String VERSIONED_INSTALL_LOCATION_ENV_PARAMETER_PREFIX = "saker.windows.sdk.windowskits.install.location.";
@@ -76,7 +82,43 @@ public class VersionsWindowsKitsSDKReferenceEnvironmentProperty
 		if (sdkref != null) {
 			return sdkref;
 		}
-		throw new SDKNotFoundException("Windows Kits SDK not found for versions: " + versions);
+		throw new SDKNotFoundException("Windows Kits SDK not found for versions: "
+				+ (versions == null ? "any" : StringUtils.toStringJoin(", ", versions)));
+	}
+
+	@Override
+	public void contributeBuildTraceInformation(SDKReference propertyvalue,
+			PropertyComputationFailedException thrownexception) {
+		if (propertyvalue != null) {
+			try {
+				LinkedHashMap<Object, Object> values = new LinkedHashMap<>();
+				LinkedHashMap<Object, Object> props = new LinkedHashMap<>();
+
+				values.put("Windows Kits SDK "
+						+ propertyvalue.getProperty(SakerWindowsUtils.SDK_WINDOWSKITS_PROPERTY_VERSION), props);
+				props.put("Install location",
+						propertyvalue.getPath(SakerWindowsUtils.SDK_WINDOWSKITS_PATH_HOME).toString());
+				BuildTrace.setValues(values, BuildTrace.VALUE_CATEGORY_ENVIRONMENT);
+			} catch (Exception e) {
+				if (saker.build.meta.Versions.VERSION_FULL_COMPOUND >= 8_014) {
+					BuildTrace.ignoredException(e);
+				}
+			}
+		} else {
+			//exceptions as values supported since 0.8.14
+			if (saker.build.meta.Versions.VERSION_FULL_COMPOUND >= 8_014) {
+				if (versions == null) {
+					BuildTrace.setValues(ImmutableUtils.singletonMap("Windows Kits SDK", thrownexception.getCause()),
+							BuildTrace.VALUE_CATEGORY_ENVIRONMENT);
+				} else {
+					for (String v : versions) {
+						BuildTrace.setValues(
+								ImmutableUtils.singletonMap("Windows Kits SDK " + v, thrownexception.getCause()),
+								BuildTrace.VALUE_CATEGORY_ENVIRONMENT);
+					}
+				}
+			}
+		}
 	}
 
 	@Override

@@ -4,19 +4,24 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
+import saker.build.exception.PropertyComputationFailedException;
 import saker.build.file.path.SakerPath;
 import saker.build.file.provider.LocalFileProvider;
-import saker.build.runtime.environment.EnvironmentProperty;
 import saker.build.runtime.environment.SakerEnvironment;
+import saker.build.thirdparty.saker.util.ImmutableUtils;
 import saker.build.thirdparty.saker.util.ObjectUtils;
+import saker.build.trace.BuildTrace;
+import saker.build.trace.TraceContributorEnvironmentProperty;
 import saker.sdk.support.api.SDKReference;
 import saker.sdk.support.api.exc.SDKNotFoundException;
+import saker.windows.api.SakerWindowsUtils;
 import saker.windows.impl.SakerWindowsImplUtils;
 
 public class WindowsAppCertKitSDKReferenceEnvironmentProperty
-		implements EnvironmentProperty<SDKReference>, Externalizable {
+		implements TraceContributorEnvironmentProperty<SDKReference>, Externalizable {
 	private static final long serialVersionUID = 1L;
 
 	public static final WindowsAppCertKitSDKReferenceEnvironmentProperty INSTANCE = new WindowsAppCertKitSDKReferenceEnvironmentProperty();
@@ -36,7 +41,7 @@ public class WindowsAppCertKitSDKReferenceEnvironmentProperty
 			SakerPath appcertexepath = installdir.resolve("App Certification Kit/appcert.exe");
 			try {
 				if (LocalFileProvider.getInstance().getFileAttributes(appcertexepath).isRegularFile()) {
-					return new WindowsAppCertKitSDKReference(installdir);
+					return new WindowsAppCertKitSDKReference(appcertexepath.getParent());
 				}
 			} catch (IOException e) {
 				continue;
@@ -55,6 +60,32 @@ public class WindowsAppCertKitSDKReferenceEnvironmentProperty
 			return sdkref;
 		}
 		throw new SDKNotFoundException("Windows App Certification Kit SDK not found.");
+	}
+
+	@Override
+	public void contributeBuildTraceInformation(SDKReference propertyvalue,
+			PropertyComputationFailedException thrownexception) {
+		if (propertyvalue != null) {
+			try {
+				LinkedHashMap<Object, Object> values = new LinkedHashMap<>();
+				LinkedHashMap<Object, Object> props = new LinkedHashMap<>();
+
+				values.put("Windows App Cert Kit", props);
+				props.put("Install location",
+						propertyvalue.getPath(SakerWindowsUtils.SDK_WINDOWSAPPCERTKIT_PATH_HOME).toString());
+				BuildTrace.setValues(values, BuildTrace.VALUE_CATEGORY_ENVIRONMENT);
+			} catch (Exception e) {
+				if (saker.build.meta.Versions.VERSION_FULL_COMPOUND >= 8_014) {
+					BuildTrace.ignoredException(e);
+				}
+			}
+		} else {
+			//exceptions as values supported since 0.8.14
+			if (saker.build.meta.Versions.VERSION_FULL_COMPOUND >= 8_014) {
+				BuildTrace.setValues(ImmutableUtils.singletonMap("Windows App Cert Kit", thrownexception.getCause()),
+						BuildTrace.VALUE_CATEGORY_ENVIRONMENT);
+			}
+		}
 	}
 
 	@Override

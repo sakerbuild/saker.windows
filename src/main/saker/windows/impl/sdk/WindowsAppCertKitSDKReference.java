@@ -40,15 +40,17 @@ public class WindowsAppCertKitSDKReference implements SDKReference, Externalizab
 		}
 		String loweridentifier = identifier.toLowerCase(Locale.ENGLISH);
 		switch (loweridentifier) {
+			case SakerWindowsUtils.SDK_WINDOWSAPPCERTKIT_PATH_HOME: {
+				return baseDirectory;
+			}
 			case SakerWindowsUtils.SDK_WINDOWSAPPCERTKIT_PATH_APPXLAUNCHER: {
-				return baseDirectory.resolve("App Certification Kit",
-						"microsoft.windows.softwarelogo.appxlauncher.exe");
+				return baseDirectory.resolve("microsoft.windows.softwarelogo.appxlauncher.exe");
 			}
 			case SakerWindowsUtils.SDK_WINDOWSAPPCERTKIT_PATH_MAKEAPPX: {
-				return baseDirectory.resolve("App Certification Kit", "makeappx.exe");
+				return baseDirectory.resolve("makeappx.exe");
 			}
 			case SakerWindowsUtils.SDK_WINDOWSAPPCERTKIT_PATH_SIGNTOOL: {
-				return baseDirectory.resolve("App Certification Kit", "signtool.exe");
+				return baseDirectory.resolve("signtool.exe");
 			}
 		}
 		return null;

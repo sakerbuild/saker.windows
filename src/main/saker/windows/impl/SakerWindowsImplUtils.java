@@ -210,7 +210,7 @@ public class SakerWindowsImplUtils {
 			SakerPath appcertexepath = versionedwinkitsdir.resolve("App Certification Kit/appcert.exe");
 			try {
 				if (fp.getFileAttributes(appcertexepath).isRegularFile()) {
-					return new WindowsAppCertKitSDKReference(versionedwinkitsdir);
+					return new WindowsAppCertKitSDKReference(appcertexepath.getParent());
 				}
 			} catch (IOException e) {
 				continue;

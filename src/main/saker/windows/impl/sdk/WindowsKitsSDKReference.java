@@ -62,6 +62,9 @@ public class WindowsKitsSDKReference implements SDKReference, Externalizable {
 		}
 		String loweridentifier = identifier.toLowerCase(Locale.ENGLISH);
 		switch (loweridentifier) {
+			case SakerWindowsUtils.SDK_WINDOWSKITS_PATH_HOME: {
+				return baseDirectory;
+			}
 			case SakerWindowsUtils.SDK_WINDOWSKITS_PATH_BIN_ARM: {
 				return baseDirectory.resolve("bin", version, "arm");
 			}
@@ -138,7 +141,7 @@ public class WindowsKitsSDKReference implements SDKReference, Externalizable {
 			case SakerWindowsUtils.SDK_WINDOWSKITS_PATH_SIGNTOOL_ARM64: {
 				return baseDirectory.resolve("bin", version, "arm64", "signtool.exe");
 			}
-			
+
 			case SakerWindowsUtils.SDK_WINDOWSKITS_PATH_RC_X86: {
 				return baseDirectory.resolve("bin", version, "x86", "rc.exe");
 			}
@@ -148,7 +151,7 @@ public class WindowsKitsSDKReference implements SDKReference, Externalizable {
 			case SakerWindowsUtils.SDK_WINDOWSKITS_PATH_RC_ARM64: {
 				return baseDirectory.resolve("bin", version, "arm64", "rc.exe");
 			}
-			
+
 			case SakerWindowsUtils.SDK_WINDOWSKITS_PATH_FXC_X86: {
 				return baseDirectory.resolve("bin", version, "x86", "fxc.exe");
 			}

@@ -39,6 +39,12 @@ public class SakerWindowsUtils {
 	public static final String SDK_NAME_WINDOWSAPPCERTKIT = "WindowsAppCertKit";
 
 	/**
+	 * SDK path identifier for the install location.
+	 * <p>
+	 * Points to the base directory. e.g. <code>c:\Program Files (x86)\Windows Kits\10\</code>
+	 */
+	public static final String SDK_WINDOWSKITS_PATH_HOME = "home";
+	/**
 	 * SDK path identifier for the ucrt include directory.
 	 */
 	public static final String SDK_WINDOWSKITS_PATH_INCLUDE_UCRT = "include.ucrt";
@@ -175,6 +181,12 @@ public class SakerWindowsUtils {
 	public static final String SDK_WINDOWSKITS_PROPERTY_VERSION = "version";
 
 	/**
+	 * SDK path identifier for the install location.
+	 * <p>
+	 * Points to the base directory. e.g. <code>c:\Program Files (x86)\Windows Kits\10\</code>
+	 */
+	public static final String SDK_WINDOWSUAP_PATH_HOME = "home";
+	/**
 	 * SDK path identifier for the Platform.xml file.
 	 * <p>
 	 * The Platform.xml file is usually locateded at
@@ -209,6 +221,10 @@ public class SakerWindowsUtils {
 	 */
 	public static final String SDK_WINDOWSUAP_PATH_MAKEAPPX_X64 = "exe.x64.makeappx";
 
+	/**
+	 * SDK path identifier for the home of the Windows App Certification Kit installation directory.
+	 */
+	public static final String SDK_WINDOWSAPPCERTKIT_PATH_HOME = "home";
 	/**
 	 * SDK path identifier for the appxlauncher tool.
 	 */

@@ -50,6 +50,9 @@ public class WindowsUapSDKReference implements SDKReference, Externalizable {
 		}
 		String loweridentifier = identifier.toLowerCase(Locale.ENGLISH);
 		switch (loweridentifier) {
+			case SakerWindowsUtils.SDK_WINDOWSUAP_PATH_HOME: {
+				return baseDirectory;
+			}
 			case SakerWindowsUtils.SDK_WINDOWSUAP_PATH_PLATFORM_XML: {
 				return baseDirectory.resolve("Platforms", "UAP", version, "Platform.xml");
 			}
