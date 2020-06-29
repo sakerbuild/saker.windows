@@ -35,7 +35,7 @@ import saker.windows.main.appx.BundleAppxTaskFactory;
 import saker.windows.main.appx.PackageAppxTaskFactory;
 
 @NestTaskInformation(returnType = @NestTypeUsage(DocSigntoolSignWorkerTaskOutput.class))
-@NestInformation("Signs the input files using the SignTool.\n"
+@NestInformation("Signs the input files using SignTool.\n"
 		+ "The task takes the input files and performs its signing in a separate build directory.\n"
 		+ "Input files that are accepted by the SignTool can be passed to this task as well. Currently "
 		+ "it is generally used to sign .appx and .appxbundle files for distributing them.")

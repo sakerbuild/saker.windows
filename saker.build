@@ -67,6 +67,7 @@ export(
 				Nest-Bundle-Format-Version: 1,
 				Nest-Bundle-Identifier: "saker.windows-v{ global(VERSION_saker.windows) }",
 				Nest-Bundle-Source: "saker.windows-sources-v{ global(VERSION_saker.windows) }",
+				Nest-ClassPath-Supported-Build-System-Versions: "[0.8.9)",
 			},
 		},
 	)
@@ -87,6 +88,7 @@ export(
 				Nest-Bundle-Format-Version: 1,
 				Nest-Bundle-Identifier: "saker.windows-api-v{ global(VERSION_saker.windows) }",
 				Nest-Bundle-Source: "saker.windows-sources-v{ global(VERSION_saker.windows) }",
+				Nest-ClassPath-Supported-Build-System-Versions: "[0.8.9)",
 			},
 		},
 	)
@@ -111,6 +113,7 @@ export(
 				Nest-Bundle-Format-Version: 1,
 				Nest-Bundle-Identifier: "saker.windows-impl-v{ global(VERSION_saker.windows) }",
 				Nest-Bundle-Source: "saker.windows-sources-v{ global(VERSION_saker.windows) }",
+				Nest-ClassPath-Supported-Build-System-Versions: "[0.8.9)",
 			},
 		},
 	)
@@ -137,4 +140,15 @@ export(
 install() {
 	$export = include(export)
 	nest.local.install($export[bundlepaths])
+}
+upload(
+	in export = export()
+) {
+	include(Path: secret/secrets.build)
+	nest.server.upload(
+		Bundles: $export[bundlepaths],
+		APIKey: global(saker.windows.UPLOAD_API_KEY),
+		APISecret: global(saker.windows.UPLOAD_API_SECRET),
+		Overwrite: true,
+	)
 }
