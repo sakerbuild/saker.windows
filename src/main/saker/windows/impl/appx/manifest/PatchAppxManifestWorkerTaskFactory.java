@@ -185,6 +185,13 @@ public class PatchAppxManifestWorkerTaskFactory implements TaskFactory<Object>, 
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		return "PatchAppxManifestWorkerTaskFactory[" + (file != null ? "file=" + file + ", " : "")
+				+ (processorArchitecture != null ? "processorArchitecture=" + processorArchitecture + ", " : "")
+				+ (version != null ? "version=" + version : "") + "]";
+	}
+
 	private static class AppxManifestPatchingSakerFile extends SakerFileBase {
 		private static final String ELEM_PACKAGE = "Package";
 		private static final String ELEM_IDENTITY = "Identity";

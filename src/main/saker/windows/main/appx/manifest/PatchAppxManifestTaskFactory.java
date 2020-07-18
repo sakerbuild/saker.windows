@@ -86,10 +86,10 @@ public class PatchAppxManifestTaskFactory extends FrontendTaskFactory<Object> {
 				} else {
 					outputpath = SakerPath.valueOf(TASK_NAME);
 					if (processorArchitectureOption != null) {
-						outputpath.resolve(processorArchitectureOption);
+						outputpath = outputpath.resolve(processorArchitectureOption);
 					}
 					if (versionOption != null) {
-						outputpath.resolve(versionOption);
+						outputpath = outputpath.resolve(versionOption);
 					}
 					outputpath = outputpath.resolve("AppxManifest.xml");
 				}
