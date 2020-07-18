@@ -329,7 +329,7 @@ public class PatchAppxManifestWorkerTaskFactory implements TaskFactory<Object>, 
 		@Override
 		public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
 			originalContents = SerialUtils.readExternalObject(in);
-			originalContents = SerialUtils.readExternalObject(in);
+			processorArchitecture = SerialUtils.readExternalObject(in);
 			version = SerialUtils.readExternalObject(in);
 		}
 
