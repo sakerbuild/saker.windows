@@ -1,6 +1,6 @@
 # saker.windows
 
-![Build status](https://img.shields.io/azure-devops/build/sakerbuild/6fc2e4d9-c1b3-43db-84a8-900dd94c937a/27/master)
+[![Build status](https://img.shields.io/azure-devops/build/sakerbuild/6fc2e4d9-c1b3-43db-84a8-900dd94c937a/27/master)](https://dev.azure.com/sakerbuild/saker.windows/_build) [![Latest version](https://mirror.nest.saker.build/badges/saker.windows/version.svg)](https://nest.saker.build/package/saker.windows "saker.windows | saker.nest")
 
 Windows tooling and development support for the saker.build system
 
